@@ -37,11 +37,14 @@ public class AppUserService implements UserDetailsService {
               .isPresent();
 
       if (userExists) {
+        boolean userEnabled = appUserRepository.findByEmail(appUser.getEmail()).get().isEnabled();
+
+        if (userEnabled) {
+          throw new IllegalStateException("email already taken");
+        }
 
         // TODO check of attributes are the same and
         // TODO if email not confirmed send confirmation email.
-
-        throw new IllegalStateException("email already taken");
       }
 
       String encodePassword = bCryptPasswordEncoder.encode(appUser.getPassword());
