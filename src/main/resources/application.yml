@@ -17,21 +17,41 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
+  # Uncomment to send a REAL email
   mail:
-    host: localhost
-    port: 1025
-    username: hello
-    password: hello
-
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    username: logreg9@gmail.com
+    password: JkHlJhlhkl232
+    port: 587
     properties:
       mail:
         smtp:
-          ssl:
-            trust: "*"
+          ssl.trust: smtp.gmail.com
           auth: true
           starttls:
             enable: true
-          connectiontimeout: 5000
-          timeout: 3000
-          writetimeout: 5000
+    protocol: smtp
+    test-connection: false
+
+#  # Uncomment to send TEST email on MAILDEV ( cmd.exe -> maildev )
+#  mail:
+#    host: localhost
+#    port: 1025
+#    username: hello
+#    password: hello
+#
+#    properties:
+#      mail:
+#        smtp:
+#          ssl:
+#            trust: "*"
+#          auth: true
+#          starttls:
+#            enable: true
+#          connectiontimeout: 5000
+#          timeout: 3000
+#          writetimeout: 5000
+
+
 

@@ -1,27 +1,41 @@
 package com.loginRegister.loginRegister.registration;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.loginRegister.loginRegister.appuser.AppUser;
 import com.loginRegister.loginRegister.appuser.AppUserRole;
 import com.loginRegister.loginRegister.appuser.AppUserService;
 import com.loginRegister.loginRegister.email.EmailSender;
 import com.loginRegister.loginRegister.registration.token.ConfirmationToken;
 import com.loginRegister.loginRegister.registration.token.ConfirmationTokenService;
+import com.loginRegister.loginRegister.registration.token.Response;
 import lombok.AllArgsConstructor;
+import netscape.javascript.JSException;
+import netscape.javascript.JSObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.StringWriter;
 import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
 public class RegistrationService {
 
+    public static final String HOST = "10.55.200.196";
+//    public static final String HOST = "localhost";
+
+
     private final AppUserService appUserService;
     private EmailValidator emailValidator;
     private ConfirmationTokenService confirmationTokenService;
     private final EmailSender emailSender;
 
-    public String register(RegistrationRequest request) {
+    public String register(RegistrationRequest request) throws JsonProcessingException {
         boolean isValidEmail = emailValidator.test(request.getEmail());
         if (!isValidEmail) {
             throw new IllegalStateException("email not valid");
@@ -36,10 +50,14 @@ public class RegistrationService {
 
                 )
         );
-        String link = "http://localhost:8080/api/v1/registration/confirm?token=" + token;
+        String link = "http://" + HOST + ":8080/api/v1/registration/confirm?token=" + token;
         emailSender.send(request.getEmail(),
                 buildEmail(request.getFirstName(), link));
-        return token;
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(new Response(token));
+
+        return "Verification Email sent";
     }
 
     @Transactional
@@ -61,7 +79,9 @@ public class RegistrationService {
         confirmationTokenService.setConfirmedAt(token);
         appUserService.enableAppUser(confirmationToken.getAppUser().getEmail());
 
-        return "confirmed";
+
+        return "<h1 style=\"text-align: center;color: green;" +
+                "padding: 100px;background-color: #dadada;\">Confirmed!</h1>";
 
     }
 
